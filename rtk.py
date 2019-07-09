@@ -103,8 +103,9 @@ class ConfigsHandler:
             self.globals['substitution'] = self.__config['substitution']
 
             self.configs = {}
-            for config in self.__config['configs']:
-                self.configs[config['name']] = Config(self.globals, **config)
+            if self.__config['configs']:
+                for config in self.__config['configs']:
+                    self.configs[config['name']] = Config(self.globals, **config)
 
     def dump_config_file(self, out_file):
         out = self.__config.copy()
@@ -125,13 +126,23 @@ if __name__ == '__main__':
     cfgh = ConfigsHandler(config_file=config_file)
 
     if args[0] in ('new', 'n'):
-        cfgh.new_config(args[1], args[2])
+        if len(args) < 2:
+            print('Missing config name')
+        elif len(args) < 3:
+            print('Missing outfile path')
+        else:
+            cfgh.new_config(args[1], args[2])
     elif args[0] in ('delete', 'del', 'd'):
         print(args[1])
         pass
     elif args[0] in ('add', 'a'):
-        config = cfgh.get_config(args[1])
-        config.add_infile(args[2])
+        if len(args) < 2:
+            print('Missing config name')
+        elif len(args) < 3:
+            print('Missing infile to add')
+        else:
+            config = cfgh.get_config(args[1])
+            config.add_infile(args[2])
     elif args[0] in ('list', 'l'):
         for name, config in cfgh.configs.items():
             print(f"""- {name}

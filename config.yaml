@@ -1,8 +1,8 @@
 configs:
 -   infiles:
-    - /home/marten/src/rtk/test.yaml.base
-    name: test
-    outfile: /home/marten/src/rtk/test.yaml
+    - /home/marten/.config/i3/config.base
+    name: i3
+    outfile: /home/marten/.config/i3/config
 substitution:
     default: true
     source: dracula.yaml
