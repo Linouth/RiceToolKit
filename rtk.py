@@ -1,7 +1,8 @@
+#!/bin/python3
 from os import path
 from string import Template
 from glob import glob
-import yaml
+from ruamel import yaml
 import sys
 import getopt
 
@@ -61,8 +62,11 @@ class Config:
         # Substituting variables
         if self.globals['substitution'].get('default', False) or \
            self.options.get('substitute', False):
-            with open(self.globals['substitution']['source'], 'r') as f:
-                sub_source = yaml.load(f)
+            with open(
+                    path.join(self.globals['substitution']['basepath'],
+                              self.globals['substitution']['source']),
+                    'r') as f:
+                sub_source = yaml.safe_load(f)
                 out_str = Template(out_str).safe_substitute(
                             **sub_source)
 
@@ -97,7 +101,7 @@ class ConfigsHandler:
 
     def load_config_file(self, config_file):
         with open(config_file, 'r') as f:
-            self.__config = yaml.load(f.read())
+            self.__config = yaml.safe_load(f.read())
 
             self.globals = {}
             self.globals['substitution'] = self.__config['substitution']
@@ -115,9 +119,15 @@ class ConfigsHandler:
             yaml.dump(out, f, default_flow_style=False, indent=4)
 
 
+def print_exit(msg):
+    print(msg)
+    sys.exit(1)
+
+
 if __name__ == '__main__':
 
-    config_file = 'config.yaml'
+    # config_file = 'config.yaml'
+    config_file = '/home/marten/src/rtk/config.yaml'
     opts, args = getopt.getopt(sys.argv[1:], 'c:', ['config='])
     for opt, arg in opts:
         if opt in ('-c', '--config'):
@@ -125,24 +135,32 @@ if __name__ == '__main__':
 
     cfgh = ConfigsHandler(config_file=config_file)
 
-    if args[0] in ('new', 'n'):
+    if args[0] in ('init'):
         if len(args) < 2:
-            print('Missing config name')
-        elif len(args) < 3:
-            print('Missing outfile path')
-        else:
-            cfgh.new_config(args[1], args[2])
-    elif args[0] in ('delete', 'del', 'd'):
-        print(args[1])
-        pass
+            print_exit('Missing config name')
+        if len(args) < 3:
+            print_exit('Missing outfile path')
+
+        cfgh.new_config(args[1], path.realpath(args[2]))
+
     elif args[0] in ('add', 'a'):
         if len(args) < 2:
-            print('Missing config name')
-        elif len(args) < 3:
-            print('Missing infile to add')
-        else:
-            config = cfgh.get_config(args[1])
-            config.add_infile(args[2])
+            print_exit('Missing config name')
+        if len(args) < 3:
+            print_exit('Missing infile to add')
+
+        sopts, sargs = getopt.getopt(args[2:], 's:', ['set='])
+        for opt, arg in sopts:
+            if opt in ('-s', '--set'):
+                # Use a set
+                pass
+
+        config = cfgh.get_config(args[1])
+        config.add_infile(path.realpath(args[2]))
+
+    elif args[0] in ('delete', 'del', 'd'):
+        print(path.realpath(args[1]))
+        pass
     elif args[0] in ('list', 'l'):
         for name, config in cfgh.configs.items():
             print(f"""- {name}

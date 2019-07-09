@@ -1,8 +1,13 @@
 configs:
 -   infiles:
-    - /home/marten/.config/i3/config.base
+    -   /home/marten/.config/i3/config.base
     name: i3
     outfile: /home/marten/.config/i3/config
+-   infiles:
+    -   /home/marten/.config/alacritty/alacritty.base.yml
+    name: alacritty
+    outfile: /home/marten/.config/alacritty/alacritty.yml
 substitution:
+    basepath: /home/marten/src/rtk/themes/
     default: true
     source: dracula.yaml
