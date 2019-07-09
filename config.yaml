@@ -1,0 +1,8 @@
+configs:
+-   infiles:
+    - /home/marten/src/rtk/test.yaml.base
+    name: test
+    outfile: /home/marten/src/rtk/test.yaml
+substitution:
+    default: true
+    source: dracula.yaml
