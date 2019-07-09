@@ -1,10 +1,16 @@
 configs:
--   infiles:
-    -   /home/marten/.config/i3/config.base
+-   active_set: default
+    infiles:
+        default:
+        -   /home/marten/.config/i3/config.base
+        test:
+        -   /home/marten/.config/i3/config.base.test
     name: i3
     outfile: /home/marten/.config/i3/config
--   infiles:
-    -   /home/marten/.config/alacritty/alacritty.base.yml
+-   active_set: default
+    infiles:
+        default:
+        -   /home/marten/.config/alacritty/alacritty.base.yml
     name: alacritty
     outfile: /home/marten/.config/alacritty/alacritty.yml
 substitution:
