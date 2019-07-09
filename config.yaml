@@ -3,8 +3,7 @@ configs:
     infiles:
         default:
         -   /home/marten/.config/i3/config.base
-        test:
-        -   /home/marten/.config/i3/config.base.test
+        test: []
     outfile: /home/marten/.config/i3/config
     active_set: default
 -   name: alacritty

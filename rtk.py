@@ -36,15 +36,18 @@ class Config:
             self.infiles[fileset] = []
         self.infiles[fileset].append(filepath)
 
-    def del_infile(self, filepath):
+    def del_infile(self, filepath, fileset=None):
+        if not fileset:
+            fileset = self.active_set
+
         try:
-            self.infiles.remove(filepath)
+            self.infiles[fileset].remove(filepath)
         except ValueError:
-            print(f'File {filepath} not in infiles')
+            print(f'File {filepath} not in infiles of set {fileset}')
 
     def change_set(self, nfset):
         if nfset not in self.infiles.keys():
-            print(f'Set {nfset} not found in {self.name}')
+            print(f'Set {nfset} not found in {self.name}, creating new set')
         self.active_set = nfset
 
     # Load infiles, substitute variables and save to outfile
@@ -138,8 +141,15 @@ class ConfigsHandler:
             yaml.dump(out, f, default_flow_style=False, indent=4, Dumper=yaml.RoundTripDumper)
 
     def print_all(self):
+        for name in self.configs.keys():
+            self.print(name)
+
+    def print(self, name):
         pad = ' '*4
-        for name, config in self.configs.items():
+
+        config = self.configs.get(name)
+
+        if config:
             print(f'{name}:')
             print(f'{pad}infiles:')
             for fileset, infiles in config.infiles.items():
@@ -147,6 +157,8 @@ class ConfigsHandler:
             print(f'{pad}outfile: {config.outfile}')
             print(f'{pad}active_set: {config.active_set}')
             print()
+        else:
+            print(f'No config {name} available')
 
     def print_configs(self):
         for config in self.configs.keys():
@@ -187,8 +199,12 @@ if __name__ == '__main__':
 
     # Options not needing config name as argument
     if args[0] in ('list', 'l'):
-        cfgh.print_all()
+        if len(args) > 1:
+            cfgh.print(args[1])
+        else:
+            cfgh.print_all()
     elif args[0]in ('reconfigure', 'reconf', 'r'):
+        print('Combining infiles, replacing variables and exporting to outfile for all configs')
         cfgh.reconfigure_configs()
     else:
         # Options needing config name as argument
@@ -198,31 +214,46 @@ if __name__ == '__main__':
 
         if args[0] in ('init'):
             if len(args) < 3:
+                print('Initialize new config')
                 print_exit('Missing outfile path')
 
             cfgh.init_config(args[1], path.realpath(args[2]))
+            print(f'{args[1]} initialized with outfile {path.realpath(args[2])}')
 
         elif args[0] in ('add', 'a'):
+            config = cfgh.get_config(args[1])
+
             if len(args) < 3:
+                print(f'Add infile to currently active set: {config.active_set}')
                 print_exit('Missing infile to add')
 
-            config = cfgh.get_config(args[1])
             config.add_infile(path.realpath(args[2]))
+            print(f'infile {path.realpath(args[2])} added to set {config.active_set}')
         elif args[0] in ('set', 's'):
             config = cfgh.get_config(args[1])
 
             if len(args) < 3:
+                new = True
                 for fset in config.infiles.keys():
                     if config.active_set == fset:
                         print(f'- [{fset}]')
+                        new = False
                     else:
                         print(f'- {fset}')
+                if new: print(f'Creating new set: {config.active_set}')
                 print_exit('Missing set to change to')
 
             config.change_set(args[2])
+            print(f'Active set of {args[1]} set to {args[2]}')
         elif args[0] in ('delete', 'del', 'd'):
-            print(path.realpath(args[1]))
-            pass
+            config = cfgh.get_config(args[1])
+
+            if len(args) < 3:
+                print(f'Delete infile from currently active set: {config.active_set}')
+                print_exit('Missing infile to remove')
+
+            config.del_infile(path.realpath(args[2]))
+            print(f'Removed {args[2]} from set {config.active_set} of {config.name}')
 
 
     cfgh.dump_config_file(config_file)
