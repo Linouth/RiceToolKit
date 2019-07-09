@@ -120,7 +120,7 @@ class ConfigsHandler:
 
     def load_config_file(self, config_file):
         with open(config_file, 'r') as f:
-            self.__config = yaml.safe_load(f.read())
+            self.__config = yaml.load(f.read(), Loader=yaml.RoundTripLoader)
 
             self.globals = {}
             self.globals['substitution'] = self.__config['substitution']
@@ -135,7 +135,7 @@ class ConfigsHandler:
         out['configs'] = [ c.export() for c in self.configs.values() ]
 
         with open(out_file, 'w') as f:
-            yaml.dump(out, f, default_flow_style=False, indent=4)
+            yaml.dump(out, f, default_flow_style=False, indent=4, Dumper=yaml.RoundTripDumper)
 
     def print_all(self):
         pad = ' '*4
