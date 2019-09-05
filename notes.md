@@ -6,5 +6,6 @@
 * ~~configs container / handler~~
     * ~~load / export config in/outfiles and settings to yaml file~~
 
+* ~~Ability to create sets of infiles so you can switch between templates~~
 
-- ~~Ability to create sets of infiles so you can switch between templates~~
+* Refactor all code, it is a frecking mess rn...
