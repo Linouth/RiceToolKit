@@ -6,6 +6,11 @@ from ruamel import yaml
 import sys
 import getopt
 
+# config_file = 'config.yaml'
+config_file = path.join(path.dirname(path.realpath(__file__)), 'config.yaml')
+config_path = path.expandvars('$HOME/.config/rtk')
+config_file = path.join(config_path, 'config.yaml')
+
 
 class Config:
     def __init__(self, glob, name, infiles, outfile, active_set, **options):
@@ -79,9 +84,11 @@ class Config:
         # Substituting variables
         if self.globals['substitution'].get('default', False) or \
            self.options.get('substitute', False):
+            basepath = self.globals['substitution']['basepath']
+            if not path.isdir(basepath):
+                basepath = path.join(config_path, basepath)
             with open(
-                    path.join(self.globals['substitution']['basepath'],
-                              self.globals['substitution']['source']),
+                    path.join(basepath,self.globals['substitution']['source']),
                     'r') as f:
                 sub_source = yaml.safe_load(f)
                 out_str = Template(out_str).safe_substitute(
@@ -164,11 +171,7 @@ class ConfigsHandler:
         for config in self.configs.keys():
             print(f'- {config}')
 
-
-# config_file = 'config.yaml'
-config_file = '/home/marten/src/rtk/config.yaml'
 actions = ['list', 'reconfigure', 'init', 'add', 'set', 'delete']
-
 
 def print_exit(msg):
     print(msg)

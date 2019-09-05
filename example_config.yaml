@@ -1,0 +1,29 @@
+configs:
+-   name: kitty
+    infiles:
+        default:
+        -   /home/marten/.config/kitty/kitty.conf.base
+    outfile: /home/marten/.config/kitty/kitty.conf
+    active_set: default
+-   name: i3
+    infiles:
+        default:
+        -   /home/marten/.config/i3/config.base
+    outfile: /home/marten/.config/i3/config
+    active_set: default
+-   name: polybar
+    infiles:
+        default:
+        -   /home/marten/.config/polybar/config.base
+    outfile: /home/marten/.config/polybar/config
+    active_set: default
+-   name: rofi
+    infiles:
+        default:
+        -   /home/marten/.config/rofi/flat.base.rasi
+    outfile: /home/marten/.config/rofi/flat.rasi
+    active_set: default
+substitution:
+    basepath: themes/
+    default: true
+    source: apprentice.yaml
